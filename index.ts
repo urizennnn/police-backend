@@ -1,20 +1,23 @@
 import express, { Request, Response } from "express";
 import "reflect-metadata";
 import dotenv from "dotenv";
-import logger from "morgan";
 import cors from "cors";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "./src/database/init";
 import process from "node:process";
-import { logInfo, logWithContext } from "./logger/log";
+import morgan from "morgan";
+import { LoggerService, LoggingMiddleware } from "./logger/log";
 
 dotenv.config();
 
 const app = express();
+export const Logger = new LoggerService();
+
 const PORT = 3000;
 
 app.use(express.json());
-app.use(logger("dev"));
+app.use(morgan("combined"));
+app.use(LoggingMiddleware);
 app.use(cors());
 
 app.get("/", (req: Request, res: Response) => {
@@ -23,14 +26,21 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-app.listen(PORT, () => {
-  prisma.$connect();
-  logInfo("Connected to the database");
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(PORT, async () => {
+  try {
+    await prisma.$connect();
+    Logger.log("Database connected");
+    Logger.verbose(`Server started on http://localhost:${PORT}`);
+  } catch (error) {
+    Logger.error("Error starting server", error);
+    process.exit(1);
+  }
 });
+
+// Graceful shutdown
 process.on("SIGINT", async () => {
   await prisma.$disconnect();
-  logWithContext("Disconnected from the database", "app");
-  console.log("Disconnected from the database");
+  Logger.log("Database disconnected");
+  Logger.log("Server stopped");
   process.exit(0);
 });
