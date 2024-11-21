@@ -28,7 +28,7 @@ export async function loginAdmin(req: Request, res: Response) {
 export async function createAdmin(req: Request, res: Response) {
   let { username, password } = req.body;
 
-  password = bcrypt.hash(password, 10);
+  password = await bcrypt.hash(password, 10);
   const admin = await prisma.admin.create({
     data: {
       username,
