@@ -12,18 +12,19 @@ import Routes from "./src/route.index";
 dotenv.config();
 
 const app = express();
+// WARN: Do not instantiate LoggerService again
 export const Logger = new LoggerService();
 
 const PORT = 3000;
 
 app.use(express.json());
+app.use(cors());
 app.use(morgan("combined"));
 app.use(LoggingMiddleware);
-app.use(cors());
 
 app.use("/api", Routes);
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   return res.status(StatusCodes.OK).json({
     message: "Hello World",
   });
