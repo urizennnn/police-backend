@@ -20,6 +20,8 @@ app.use(morgan("combined"));
 app.use(LoggingMiddleware);
 app.use(cors());
 
+app.use("/api", require("./src/route.index"));
+
 app.get("/", (req: Request, res: Response) => {
   return res.status(StatusCodes.OK).json({
     message: "Hello World",
@@ -30,7 +32,7 @@ app.listen(PORT, async () => {
   try {
     await prisma.$connect();
     Logger.log("Database connected");
-    Logger.verbose(`Server started on http://localhost:${PORT}`);
+    Logger.verbose(`Server started on http://localhost:${PORT}`, "app");
   } catch (error) {
     Logger.error("Error starting server", error);
     process.exit(1);

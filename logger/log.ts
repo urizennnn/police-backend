@@ -141,6 +141,11 @@ class LoggerService {
   }
 
   verbose(message: string, ...meta: any[]) {
+    if (!meta || meta.length === 0) {
+      this.logger.error("Meta is required for verbose logs");
+      return;
+    }
+
     this.logger.verbose(message, ...meta);
   }
 }
