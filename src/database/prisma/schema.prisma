@@ -1,0 +1,78 @@
+// This is your Prisma schema file
+// Learn more at: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  SECURED
+  PROCESSING
+  RELEASED
+}
+
+enum Rank {
+  OFFICER
+  DETECTIVE
+  SERGEANT
+  LIEUTENANT
+}
+
+enum OfficerStatus {
+  ON_DUTY
+  OFF_DUTY
+  ON_LEAVE
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+}
+
+model Case {
+  id          String     @id @default(uuid())
+  caseId      String     @unique
+  title       String
+  date        DateTime
+  status      Status
+  description String
+  Evidence    Evidence[]
+  Report      Report[]
+}
+
+model Evidence {
+  id       String   @id @default(uuid())
+  caseId   String
+  case     Case     @relation(fields: [caseId], references: [id])
+  type     String
+  date     DateTime
+  status   Status
+  location String
+  evidenceID String @map("evidence_id")
+}
+
+model Officer {
+  id          String        @id @default(uuid())
+  name       String
+  badgeNumber String
+  rank        Rank
+  status      OfficerStatus
+  cases       Case[]
+  Report      Report[]
+}
+
+model Report {
+  id        String   @id @default(uuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+  officerId String
+  officer   Officer  @relation(fields: [officerId], references: [id])
+  date      DateTime
+  status    Status
+}
