@@ -1,8 +1,7 @@
 import { IsEnum, IsString } from "class-validator";
-export enum Status {
-  SECURED = "SECURED",
-  PROCESSING = "PROCESSING",
-  RELEASED = "RELEASED",
+export enum CaseStatus {
+  OPEN = "OPEN",
+  CLOSED = "CLOSED",
 }
 export class CaseDTO {
   @IsString()
@@ -11,10 +10,10 @@ export class CaseDTO {
   @IsString()
   title: string;
 
-  @IsString()
-  status: Status;
+  @IsEnum(CaseStatus)
+  status: CaseStatus;
 
-  @IsEnum(Status)
+  @IsString()
   description: string;
 
   @IsString()

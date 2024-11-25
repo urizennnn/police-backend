@@ -3,12 +3,24 @@ import { prisma } from "../database/init";
 import { StatusCodes } from "http-status-codes";
 
 export async function createCase(req: Request, res: Response) {
-  const { title, date, status, description, caseId } = req.body;
+  const { title, status, description, caseId, officerId } = req.body;
+  const officer = await prisma.officer.findFirst({
+    where: {
+      badgeNumber: officerId,
+    },
+  });
+
+  if (!officer) {
+    return res
+      .status(400)
+      .json({ message: "Invalid officerId, officer not found" });
+  }
   const newcase = await prisma.case.create({
     data: {
       title,
-      date,
-      status,
+      date: new Date().toISOString(),
+      status: status.toUpperCase(),
+      officerId,
       description,
       caseId,
     },

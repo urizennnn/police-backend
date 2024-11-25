@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import utils from "util";
 import { OfficerStatus, Status } from "@prisma/client";
 import { prisma } from "../database/init";
 import { OfficerDTO } from "./officer.dto";
@@ -38,5 +39,41 @@ export async function createOfficer(req: Request, res: Response) {
         message: "An unexpected error occurred",
       });
     }
+  }
+}
+
+export async function fetchOfficers(_req: Request, res: Response) {
+  try {
+    const result = await prisma.officer.findMany();
+
+    return res.status(StatusCodes.OK).json({
+      message: "Officer retrieved",
+      result: result,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Something went wrong",
+    });
+  }
+}
+
+export async function getOfficers(req: Request, res: Response) {
+  try {
+    const { number } = req.body;
+    const officer = await prisma.officer.findFirst({
+      where: {
+        badgeNumber: number,
+      },
+    });
+    return res.status(StatusCodes.OK).json({
+      message: "Officer retrieved",
+      officer: officer,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Something went wrong",
+    });
   }
 }

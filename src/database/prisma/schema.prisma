@@ -16,6 +16,12 @@ enum Status {
   RELEASED
 }
 
+enum ReportStatus{
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum Rank {
   OFFICER
   DETECTIVE
@@ -29,8 +35,12 @@ enum OfficerStatus {
   ON_LEAVE
 }
 
+enum CaseStatus {
+  OPEN
+  CLOSED
+}
 model Admin {
-  id       String @id @default(cuid())
+  id       String @id @default(uuid())
   username String @unique
   password String
 }
@@ -40,11 +50,11 @@ model Case {
   caseId      String     @unique
   title       String
   date        DateTime
-  status      Status
+  status      CaseStatus
   description String
   Evidence    Evidence[]
   Report      Report[]
-  Officer     Officer?   @relation(fields: [officerId], references: [id])
+  Officer     Officer?   @relation(fields: [officerId], references: [badgeNumber])
   officerId   String?
 }
 
@@ -62,7 +72,7 @@ model Evidence {
 model Officer {
   id          String        @id @default(uuid())
   name        String
-  badgeNumber String
+  badgeNumber String       @unique
   rank        Rank
   status      OfficerStatus
   cases       Case[]
@@ -76,5 +86,6 @@ model Report {
   officerId String
   officer   Officer  @relation(fields: [officerId], references: [id])
   date      DateTime
-  status    Status
+  status    ReportStatus
 }
+

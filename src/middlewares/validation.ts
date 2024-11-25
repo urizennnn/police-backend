@@ -17,7 +17,7 @@ export function validationMiddleware<T>(type: new () => T) {
       });
     }
 
-    req.body = dtoObject; // Update request body with transformed object
+    req.body = dtoObject;
     next();
   };
 }
